@@ -17,6 +17,8 @@ struct table{
 		attrs = new attr[attr_num];
 		primarykey_pos = pos;
 	}
+
+	// free memory
 	~table(){
 		delete []attrs;
 	}
