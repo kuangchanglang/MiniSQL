@@ -23,5 +23,6 @@ void dropClause(string query);
 
 //utils
 void trim(string &src);
+int getType(string type);
 
 #endif

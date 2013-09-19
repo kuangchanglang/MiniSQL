@@ -1,6 +1,8 @@
 #include<iostream>
+#include<vector>
 #include<stdlib.h>
 #include<string>
+#include "table.h"
 #include "interpreter.h"
 using namespace std;
 
@@ -89,6 +91,9 @@ void createTableClause(string query){
 		}
 
 		string table_name = query.substr(0,left_bracket_pos);
+		vector<attr> attrs;
+		int primarykey_pos;
+
 		trim(table_name);
 		int right_bracket_pos = query.find_last_of(')');
 		
@@ -99,17 +104,64 @@ void createTableClause(string query){
 			return ;
 
 		}else{
+			// create table tablename(create_definition);
 			string create_definition = query.substr(left_bracket_pos+1,right_bracket_pos-left_bracket_pos-1);
+			trim(create_definition);
 			cout<<create_definition<<endl;
 			if(right_bracket_pos+1>=query.length()){
-				//normal
-				vector<attr> attrs;
+				// no content after right bracket, normal situation
 				int comma_pos = create_definition.find_first_of(",");
 				while(comma_pos!=-1){
+					//parse each attribute: attr_name attr_type attr_constraint
+					string attr_string = create_definition.substr(0,comma_pos);
+					trim(attr_string);
+					int s_pos = attr_string.find_first_of(" ");
+				    if(s_pos==-1){
+						cout<<"You have an error in your SQL syntax near in attribute definition."<<endl;
+						return;
+					}
+					string attr_name = attr_string.substr(0,s_pos);
+					string type_and_constraint = attr_string.substr(s_pos+1);
+					trim(type_and_constraint);
+					s_pos = type_and_constraint.find_first_of(" ");
+					
+					string type_str;
+					string constraint;
+					if(s_pos==-1){
+						// no constraint
+						type_str = type_and_constraint;
+						
+					}else{
+						// with constraint
+						type_str = type_and_constraint.substr(0,s_pos);
+						constraint = type_and_constraint.substr(s_pos+1);
+						trim(constraint);
+
+					}
+					
+					int attr_type = getType(type_str);
+					bool unique = false;
+					if(attr_type==-1){
+						cout<<"You have an error in your SQL syntax near "<<type_str<<"."<<endl;
+						cout<<"Unknown attribute type."<<endl;
+						return;
+					}
+					if(constraint=="primarykey"){
+
+					}else if(constraint=="unique"){
+						unique = true;
+					}else{
+						cout<<"You have an error in your SQL syntax near "<<attr_type<<"."<<endl;
+						cout<<"Unknown attribute type."<<endl;
+						return;
+					}
+
+					struct attr one_attr(attr_name,attr_type,unique);
+					attrs.push_back(one_attr);
 
 					create_definition = create_definition.substr(comma_pos+1);
+					trim(create_definition);
 					comma_pos = create_definition.find_first_of(",");
-
 				}
 
 
@@ -187,4 +239,16 @@ void trim(string &src){
 
 	src = src.substr(s_pos,e_pos-s_pos+1);
 	return;
+}
+
+int getType(string type){
+
+	if(type=="int"){
+		return 1;
+	}
+	if(type=="float"){
+		return 2;
+	}
+
+	return -1;
 }
