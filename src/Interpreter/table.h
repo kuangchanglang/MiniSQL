@@ -7,6 +7,7 @@ struct attr{
 	string attr_name;
 	int attr_type;
 	bool is_unique;
+	attr(){}
 	attr(string name,int type,bool unique){
 		attr_name=name;
 		attr_type=type;
@@ -19,12 +20,12 @@ struct table{
 	string tname;
 	int attr_num;
 	vector<attr> attrs;
-	int primarykey_pos;
-	table(string name, vector<attr> attr_vec, int pos=-1){
+	string primarykey_column;
+	table(string name, vector<attr> attr_vec, string column=""){
 		tname = name;
 		attrs = attr_vec;
 		attr_num = attrs.size();
-		primarykey_pos = pos;
+		primarykey_column = column;
 	}
 
 	// free memory

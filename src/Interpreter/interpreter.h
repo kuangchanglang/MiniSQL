@@ -2,6 +2,7 @@
 #define __INTERPRETER_H__
 
 #include <string>
+#include "table.h"
 using namespace std;
 
 void doOneQuery(string query);
@@ -20,6 +21,7 @@ void useClause(string query);
 
 void dropClause(string query);
 
+attr parseAttribute(string attr_str,bool &is_primarykey_defined,string &primarykey_column);
 
 //utils
 void trim(string &src);
