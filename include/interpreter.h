@@ -28,10 +28,10 @@ void dropIndexClause(string iname);
 
 void execFileClause(string query);
 
-attr parseAttribute(string attr_str,bool &is_primarykey_defined,string &primarykey_column);
+Attr parseAttribute(string attr_str,bool &is_primarykey_defined,string &primarykey_column);
 
-vector<condition> getConditions(string cond_str);
-condition getCondition(string one_cond_str);
+vector<Condition> getConditions(string cond_str);
+Condition getCondition(string one_cond_str);
 
 //utils
 void trim(string &src);

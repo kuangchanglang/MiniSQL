@@ -135,7 +135,7 @@ void createTableClause(string query){
 		}
 
 		string table_name = query.substr(0,left_bracket_pos);
-		vector<attr> attrs;
+		vector<Attr> attrs;
 		string primarykey_column="";
 
 		trim(table_name);
@@ -160,7 +160,7 @@ void createTableClause(string query){
 				while(comma_pos!=-1 ){
 					//parse each attribute: attr_name attr_type attr_constraint
 					string attr_str = create_definition.substr(0,comma_pos);
-					attr one_attr;
+					Attr one_attr;
 					try{
 						one_attr = parseAttribute(attr_str,is_primarykey_defined,primarykey_column);
 						attrs.push_back(one_attr);
@@ -177,7 +177,7 @@ void createTableClause(string query){
 				}
 				
 				//last attribute
-				attr one_attr;
+				Attr one_attr;
 				try{
 					one_attr = parseAttribute(create_definition,is_primarykey_defined,primarykey_column);
 					attrs.push_back(one_attr);
@@ -210,7 +210,7 @@ void createTableClause(string query){
 /***
   *parse each attribute: attr_name attr_type attr_constraint
 ***/
-attr parseAttribute(string attr_string, bool &is_primarykey_defined, string &primarykey_column){
+Attr parseAttribute(string attr_string, bool &is_primarykey_defined, string &primarykey_column){
 	trim(attr_string);
 	if(attr_string.find("primary key")==0){
 		// primary key 
@@ -302,7 +302,7 @@ attr parseAttribute(string attr_string, bool &is_primarykey_defined, string &pri
 		throw -1;
 	}
 
-	struct attr one_attr(attr_name,attr_type,unique);
+	struct Attr one_attr(attr_name,attr_type,unique);
 	return one_attr;
 
 }
@@ -426,7 +426,7 @@ void deleteClause(string query){
 	string tname = query.substr(0,s_pos);
     query = query.substr(s_pos+1);
 	trim(query);
-	vector<condition> conditions;
+	vector<Condition> conditions;
 	if(query!=""){
 		//get word where
 		s_pos = query.find_first_of(' ');
@@ -454,20 +454,20 @@ void deleteClause(string query){
 /***
   * get condtions from string "xxx op value1 and yyy op value2..." 
   ***/
-vector<condition> getConditions(string cond_str){
+vector<Condition> getConditions(string cond_str){
 	cout<<cond_str<<endl;
-	vector<condition> conditions;
+	vector<Condition> conditions;
 	int and_pos = cond_str.find(" and ");
 	while(and_pos!=cond_str.npos){
 
 		string one_cond_str = cond_str.substr(0,and_pos);
-		condition one_condition = getCondition(one_cond_str);	
+		Condition one_condition = getCondition(one_cond_str);	
 		conditions.push_back(one_condition);
 		cond_str = cond_str.substr(and_pos+5);//3 is length of and
 		trim(cond_str);
 		and_pos = cond_str.find(" and ");
 	}
-	condition one_condition = getCondition(cond_str);	
+	Condition one_condition = getCondition(cond_str);	
 	conditions.push_back(one_condition);
 	return conditions;
 }
@@ -477,7 +477,7 @@ vector<condition> getConditions(string cond_str){
   * return struct condition if op is legal
   * otherwise throw exception
   ***/
-condition getCondition(string one_cond_str){
+Condition getCondition(string one_cond_str){
 	cout<<one_cond_str<<endl;
 	trim(one_cond_str);
 	// get attr
@@ -495,7 +495,7 @@ condition getCondition(string one_cond_str){
 		trim(value);
 		if(!isOneWord(value))
 			throw -1;
-		condition one_condition(attr,op,value);
+		Condition one_condition(attr,op,value);
 		return one_condition;
 	}
 	op_pos = one_cond_str.find("<=");
@@ -509,7 +509,7 @@ condition getCondition(string one_cond_str){
 		trim(value);
 		if(!isOneWord(value))
 			throw -1;
-		condition one_condition(attr,op,value);
+		Condition one_condition(attr,op,value);
 		return one_condition;
 	}
 	op_pos = one_cond_str.find(">=");
@@ -523,7 +523,7 @@ condition getCondition(string one_cond_str){
 		trim(value);
 		if(!isOneWord(value))
 			throw -1;
-		condition one_condition(attr,op,value);
+		Condition one_condition(attr,op,value);
 		return one_condition;
 	}
 	op_pos = one_cond_str.find_first_of("<");
@@ -537,7 +537,7 @@ condition getCondition(string one_cond_str){
 		trim(value);
 		if(!isOneWord(value))
 			throw -1;
-		condition one_condition(attr,op,value);
+		Condition one_condition(attr,op,value);
 		return one_condition;
 	}
 	op_pos = one_cond_str.find_first_of(">");
@@ -551,7 +551,7 @@ condition getCondition(string one_cond_str){
 		trim(value);
 		if(!isOneWord(value))
 			throw -1;
-		condition one_condition(attr,op,value);
+		Condition one_condition(attr,op,value);
 		return one_condition;
 	}
 	op_pos = one_cond_str.find_first_of("=");
@@ -565,7 +565,7 @@ condition getCondition(string one_cond_str){
 		trim(value);
 		if(!isOneWord(value))
 			throw -1;
-		condition one_condition(attr,op,value);
+		Condition one_condition(attr,op,value);
 		return one_condition;
 	}
 
@@ -623,7 +623,7 @@ void selectClause(string query){
 		query = query.substr(s_pos+1);
 		trim(query);
 
-		vector<condition> conditions;
+		vector<Condition> conditions;
 		if(query!=""){
 			//get word where
 			s_pos = query.find_first_of(' ');

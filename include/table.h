@@ -3,12 +3,12 @@
 #include<string>
 #include<vector>
 using namespace std;
-struct attr{
+struct Attr{
 	string attr_name;
 	int attr_type;
 	bool is_unique;
-	attr(){}
-	attr(string name,int type,bool unique){
+	Attr(){}
+	Attr(string name,int type,bool unique){
 		attr_name=name;
 		attr_type=type;
 		is_unique=unique;
@@ -16,12 +16,12 @@ struct attr{
 
 };
 
-struct table{
+struct Table{
 	string tname;
 	int attr_num;
-	vector<attr> attrs;
+	vector<Attr> attrs;
 	string primarykey_column;
-	table(string name, vector<attr> attr_vec, string column=""){
+	Table(string name, vector<Attr> attr_vec, string column=""){
 		tname = name;
 		attrs = attr_vec;
 		attr_num = attrs.size();
@@ -29,12 +29,12 @@ struct table{
 	}
 
 	// free memory
-	~table(){
+	~Table(){
 	}
 };
 
 
-struct condition{
+struct Condition{
 	string attr_name;
 	int op;
 	//op map
@@ -46,8 +46,8 @@ struct condition{
 	//5 >=
 	//-1 undefined
 	string value;
-	condition(){}
-	condition(string _attr,int _op, string _value){
+	Condition(){}
+	Condition(string _attr,int _op, string _value){
 		attr_name = _attr;
 		op = _op;
 		value = _value;
