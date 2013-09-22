@@ -4,6 +4,7 @@
 #include<string>
 #include "table.h"
 #include "interpreter.h"
+#include "catalog.h"
 using namespace std;
 
 void doOneQuery(string query){
@@ -147,69 +148,70 @@ void createTableClause(string query){
 			cout<<"Expect ')'."<<endl;
 			return ;
 
-		}else{
-			// create table tablename(create_definition);
-			string create_definition = query.substr(left_bracket_pos+1,right_bracket_pos-left_bracket_pos-1);
-			trim(create_definition);
-			//cout<<create_definition<<endl;
-			int comma_pos = create_definition.find_first_of(",");
-			if(right_bracket_pos+1>=query.length()){
-				// no content after right bracket, normal situation
-				int attr_pos = 0;
-				bool is_primarykey_defined = false;
-				while(comma_pos!=-1 ){
-					//parse each attribute: attr_name attr_type attr_constraint
-					string attr_str = create_definition.substr(0,comma_pos);
-					Attr one_attr;
-					try{
-						one_attr = parseAttribute(attr_str,is_primarykey_defined,primarykey_column);
-						attrs.push_back(one_attr);
-					}catch(int msg){
-						if(msg==-1)
-							return ;
-					}
-
-					create_definition = create_definition.substr(comma_pos+1);
-					trim(create_definition);
-					comma_pos = create_definition.find_first_of(",");
-					attr_pos ++;
-
-				}
-				
-				//last attribute
+		}
+		// create table tablename(create_definition);
+		string create_definition = query.substr(left_bracket_pos+1,right_bracket_pos-left_bracket_pos-1);
+		trim(create_definition);
+		//cout<<create_definition<<endl;
+		int comma_pos = create_definition.find_first_of(",");
+		if(right_bracket_pos+1>=query.length()){
+			// no content after right bracket, normal situation
+			int attr_pos = 0;
+			bool is_primarykey_defined = false;
+			while(comma_pos!=-1 ){
+				//parse each attribute: attr_name attr_type attr_constraint
+				string attr_str = create_definition.substr(0,comma_pos);
 				Attr one_attr;
 				try{
-					one_attr = parseAttribute(create_definition,is_primarykey_defined,primarykey_column);
+					one_attr = parseAttribute(attr_str,is_primarykey_defined,primarykey_column);
 					attrs.push_back(one_attr);
 				}catch(int msg){
 					if(msg==-1)
 						return ;
 				}
 
-				for(int i=0;i<attrs.size();i++){
-					cout<<attrs[i].attr_name<<" "<<attrs[i].attr_type<<" "<<attrs[i].is_unique<<endl;
-				}
-				cout<<primarykey_column<<endl;
-
-
-			}else{
-				string remaining = query.substr(right_bracket_pos+1);
-				trim(remaining);
-				cout<<"You have an error in your SQL syntax near "<<remaining<<"."<<endl;
-				cout<<" No more content expected after )."<<endl;
-				return ;
+				create_definition = create_definition.substr(comma_pos+1);
+				trim(create_definition);
+				comma_pos = create_definition.find_first_of(",");
+				attr_pos ++;
 
 			}
-		}
 
+			//last attribute
+			Attr one_attr;
+			try{
+				one_attr = parseAttribute(create_definition,is_primarykey_defined,primarykey_column);
+				attrs.push_back(one_attr);
+			}catch(int msg){
+				if(msg==-1)
+					return ;
+			}
+
+			//everything ok!
+			Table table(table_name,attrs,primarykey_column);
+			if(createTable("haha",table)){
+				cout<<"Table created: "<<table_name<<endl;
+			}else{
+				cout<<"Table create failed!"<<endl;
+			}
+
+		}else{
+			string remaining = query.substr(right_bracket_pos+1);
+			trim(remaining);
+			cout<<"You have an error in your SQL syntax near "<<remaining<<"."<<endl;
+			cout<<" No more content expected after )."<<endl;
+			return ;
+
+		}
 	}
+
 
 }
 
 
 /***
-  *parse each attribute: attr_name attr_type attr_constraint
-***/
+ *parse each attribute: attr_name attr_type attr_constraint
+ ***/
 Attr parseAttribute(string attr_string, bool &is_primarykey_defined, string &primarykey_column){
 	trim(attr_string);
 	if(attr_string.find("primary key")==0){

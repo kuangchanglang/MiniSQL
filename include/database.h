@@ -1,7 +1,7 @@
 #ifndef __DATABASE_H__
 #define __DATABASE_H__
 
-struct database{
+struct Database{
 	string db_name;
 };
 
