@@ -1,12 +1,26 @@
 #include<iostream>
 #include<string>
 #include "interpreter.h"
+#include "catalog.h"
 using namespace std;
+string current_db;
+
+void initDb(){
+	current_db = "default";
+	if(!isDatabaseExist(current_db)){
+		createDatabase(current_db);
+	}
+}
+
 
 int main(){
 
 	string query;//one query 
 	string line;//accept one line input
+	
+	//init db
+	initDb();
+	
 
 	cout<<"MiniSql>";//hint
 	getline(cin,line);

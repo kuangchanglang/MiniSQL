@@ -6,6 +6,8 @@
 #include "table.h"
 using namespace std;
 
+extern string current_db;
+
 void doOneQuery(string query);
 
 void createClause(string query);

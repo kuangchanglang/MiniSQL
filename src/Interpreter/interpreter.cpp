@@ -17,7 +17,6 @@ void doOneQuery(string query){
 		createClause(remaining);
 	}else if(first_word=="use"){
 		useClause(remaining);
-		cout<<"use clause"<<endl;
 	}else if(first_word=="insert"){
 		insertClause(remaining);
 	}else if(first_word=="select"){
@@ -45,6 +44,11 @@ void doOneQuery(string query){
   ***/
 void createClause(string query){
 	int space_pos = query.find_first_of(' ');
+	if(space_pos==-1){
+		cout<<"You have an error in your SQL syntax near "<<query<<endl;
+		cout<<"Too few parameter."<<endl;
+		return ;
+	}
 	string c_what = query.substr(0,space_pos);
 	string remaining = query.substr(space_pos+1);
 	trim(remaining);
@@ -66,12 +70,16 @@ void createClause(string query){
   * Create database clause
   ***/
 void createDatabaseClause(string query){
-	if(query.find(' ')!=-1){
+	if(!isOneWord(query)){
 		// too many words for create database;
-		cout<<"You have an error in your SQL syntax. Too many argument for create database: "<<query<<"."<<endl;
+		cout<<"You have an error in your SQL syntax near "<<query<<"."<<endl;
+		cout<<"Usage: create database dbname."<<endl;
 	}else{
 		// create database name query	
-		cout<<"Database created: "<<query<<"."<<endl;
+		if(createDatabase(query))
+			cout<<"Database created: "<<query<<"."<<endl;
+		else
+			cout<<"Database already exist: "<<query<<endl;
 	}
 	return ;
 
@@ -189,7 +197,7 @@ void createTableClause(string query){
 
 			//everything ok!
 			Table table(table_name,attrs,primarykey_column);
-			if(createTable("haha",table)){
+			if(createTable(current_db,table)){
 				cout<<"Table created: "<<table_name<<endl;
 			}else{
 				cout<<"Table create failed!"<<endl;
@@ -323,7 +331,12 @@ void useClause(string query){
 		cout<<"Database name can not be null"<<endl;
 		return ;
 	}else{
-		cout<<"Database changed: "<<query<<"."<<endl;
+		if(isDatabaseExist(query)){
+			current_db = query;
+			cout<<"Database changed: "<<query<<"."<<endl;
+		}else{
+			cout<<"Database not exist: '"<<query<<"'."<<endl;
+		}
 	}
 
 
@@ -766,6 +779,7 @@ int toInt(string value){
   * check line contains only one word
   ***/
 bool isOneWord(string line){
+	trim(line);
 	if(line==""||line.find(' ')!=line.npos)
 		return false;
 	return true;
