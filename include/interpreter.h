@@ -35,6 +35,8 @@ Attr parseAttribute(string attr_str,bool &is_primarykey_defined,string &primaryk
 vector<Condition> getConditions(string cond_str);
 Condition getCondition(string one_cond_str);
 
+bool containsDuplicate(vector<Attr> attrs);
+
 //utils
 void trim(string &src);
 int getType(string type);

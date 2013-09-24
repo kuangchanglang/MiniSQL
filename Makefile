@@ -7,9 +7,9 @@ TARGET = minisql
 $(OBJSDIR):
 	mkdir -p ./$@
 $(TARGET):$(OBJSDIR) $(OBJS)
-	$(CC) -o $(TARGET) $(OBJSDIR)/*.o $(CFLAGS)
+	$(CC) -o $(TARGET) $(OBJSDIR)/*.o $(CFLAGS) -g
 $(OBJS):%.o:%.cpp
-	$(CC) -c $(CFLAGS) $< -o $(OBJSDIR)/$@
+	$(CC) -c $(CFLAGS) $< -o $(OBJSDIR)/$@ -g
 clean:
 	-$(RM) $(TARGET)
 	-$(RM) $(OBJSDIR)/*.o

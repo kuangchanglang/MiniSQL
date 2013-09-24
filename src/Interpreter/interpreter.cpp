@@ -1,5 +1,6 @@
 #include<iostream>
 #include<vector>
+#include<set>
 #include<stdlib.h>
 #include<string>
 #include "table.h"
@@ -10,9 +11,13 @@ using namespace std;
 void doOneQuery(string query){
 
 	int space_pos = query.find_first_of(' ');
-	string first_word = query.substr(0,space_pos);
-	string remaining = query.substr(space_pos+1);
-	trim(remaining);
+	string first_word = "";	
+	string remaining = "";
+	if(space_pos!=-1||query!=""){
+		first_word = query.substr(0,space_pos);
+		remaining = query.substr(space_pos+1);
+		trim(remaining);
+	}
 	if(first_word=="create"){
 		createClause(remaining);
 	}else if(first_word=="use"){
@@ -195,6 +200,15 @@ void createTableClause(string query){
 					return ;
 			}
 
+			if(containsDuplicate(attrs)){
+				cout<<"Duplicate attribute name."<<endl;
+				return ;
+			}
+
+			if(attrs.size()>22){
+				cout<<"Attribute num can not exceed 22."<<endl;
+				return ;
+			}
 			//everything ok!
 			Table table(table_name,attrs,primarykey_column);
 			if(createTable(current_db,table)){
@@ -409,6 +423,16 @@ void insertClause(string query){
 		comma_pos = content.find_first_of(',');
 	}
 	values.push_back(content);
+
+	if(!isTableExist(current_db,tname)){
+		cout<<"Table not exist : "<<tname<<endl;
+		return ;
+	}
+	Table table = getTable(current_db,tname);
+	if(values.size()!=table.attr_num){
+		cout<<"Attribute num does not match."<<endl;
+		return ;
+	}
 
 	return ;
 }
@@ -715,6 +739,47 @@ void execFileClause(string query){
 	
 }
 
+int findUnmatchAttr(vector<Attr> attrs, vector<string> values){
+
+}
+
+/***
+  * check if value of string match type
+  * type 1 means int
+  * type 2 means float
+  * type n>2 means char(t) where t=n-2
+  
+  */
+bool checkValueMatchType(int type, string value){
+	if(type==1){
+		return isInt(value);		
+	}else if(type==2){
+		return isFloat(value);
+	}else{
+
+	}
+
+}
+
+
+/***
+  * check if attrs contains duplicate attrname
+  ***/
+bool containsDuplicate(vector<Attr> attrs){
+	set<string> attr_names;
+	for(int i=0;i<attrs.size();i++){
+		string attr_name = attrs[i].attr_name;
+		if(attr_names.find(attr_name)!=attr_names.end()){
+			//this attr name already exist. 
+			return true;
+		}else{
+			attr_names.insert(attr_name);
+		}
+	}
+
+	return false;
+}
+
 /*=================Utils functions=====================*/
 /***
  * Delete extra space at head and tail 
@@ -723,6 +788,8 @@ void trim(string &src){
 	if(src=="")
 		return;
 	int s_pos = src.find_first_not_of(' ');
+	if(s_pos==-1)
+		return ;
 	int e_pos = src.find_last_not_of(' ');
 
 	src = src.substr(s_pos,e_pos-s_pos+1);
@@ -752,7 +819,7 @@ int getType(string type){
 		string content = type.substr(5,right_bracket_pos-5);// 5 is length of char(
 		trim(content);
 		int t = toInt(content);
-		if(t==-1||t>255)
+		if(t<=0 ||t>255)
 			return -1;
 		return t+2;
 	}
@@ -775,8 +842,45 @@ int toInt(string value){
 	return result;
 }
 
+bool isInt(string value){
+	if(value=="")
+		return false;
+	char *ch = value.c_str();
+	for(int i=0;i<value.size();i++){
+		if(i==0){
+			if(ch[i]!='-' || ch[i]<'0' || ch[i]>'9')
+				return false;
+		}else{
+			if(ch[i]<'0' || ch[i]>'9')
+				return false;
+		}
+	}
+	return true;
+}
+
+bool isFloat(string value){
+	bool point = false;
+	if(value=="")
+		return false;
+	char *ch = value.c_str();
+	for(int i=0;i<value.size();i++){
+		if(i==0){
+			if(ch[i]!='-' || ch[i]<'0' || ch[i]>'9')
+				return false;
+		}else{
+			if(ch[i]=='.'){
+				if(point)
+					return false;
+				point = true;
+			}else if(ch[i]<'0' || ch[i]>'9')
+				return false;
+		}
+	}
+	return true;
+}
+
 /***
-  * check line contains only one word
+  * check if line contains only one word
   ***/
 bool isOneWord(string line){
 	trim(line);
@@ -784,3 +888,7 @@ bool isOneWord(string line){
 		return false;
 	return true;
 }
+
+
+
+
