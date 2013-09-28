@@ -3,12 +3,12 @@
 #include "interpreter.h"
 #include "catalog.h"
 using namespace std;
-string current_db;
+string CURRENT_DB;
 
 void initDb(){
-	current_db = "default";
-	if(!isDatabaseExist(current_db)){
-		createDatabase(current_db);
+	CURRENT_DB = "default";
+	if(!isDatabaseExist(CURRENT_DB)){
+		createDatabase(CURRENT_DB);
 	}
 }
 

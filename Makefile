@@ -1,8 +1,8 @@
 CC = g++
-CFLAGS = -Isrc -Isrc/Interpreter -Isrc/Catalog -Iinclude -O2
+CFLAGS = -Isrc -Isrc/Interpreter -Isrc/Catalog -Isrc/Record -Isrc/Buffer -Iinclude -O2
 OBJSDIR = .objs
-VPATH = src:src/Interpreter:src/Catalog:include
-OBJS = main.o interpreter.o catalog.o
+VPATH = src:src/Interpreter:src/Catalog:src/Record:src/Buffer:include
+OBJS = main.o interpreter.o catalog.o record.o buffer.o
 TARGET = minisql 
 $(OBJSDIR):
 	mkdir -p ./$@

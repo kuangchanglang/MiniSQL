@@ -21,6 +21,7 @@ struct Table{
 	int attr_num;
 	vector<Attr> attrs;
 	string primarykey_column;
+	Table(){}
 	Table(string name, vector<Attr> attr_vec, string column=""){
 		tname = name;
 		attrs = attr_vec;

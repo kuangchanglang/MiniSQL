@@ -211,7 +211,7 @@ void createTableClause(string query){
 			}
 			//everything ok!
 			Table table(table_name,attrs,primarykey_column);
-			if(createTable(current_db,table)){
+			if(createTable(CURRENT_DB,table)){
 				cout<<"Table created: "<<table_name<<endl;
 			}else{
 				cout<<"Table create failed!"<<endl;
@@ -346,7 +346,7 @@ void useClause(string query){
 		return ;
 	}else{
 		if(isDatabaseExist(query)){
-			current_db = query;
+			CURRENT_DB = query;
 			cout<<"Database changed: "<<query<<"."<<endl;
 		}else{
 			cout<<"Database not exist: '"<<query<<"'."<<endl;
@@ -424,14 +424,20 @@ void insertClause(string query){
 	}
 	values.push_back(content);
 
-	if(!isTableExist(current_db,tname)){
+	if(!isTableExist(CURRENT_DB,tname)){
 		cout<<"Table not exist : "<<tname<<endl;
 		return ;
 	}
-	Table table = getTable(current_db,tname);
+	Table table = getTable(CURRENT_DB,tname);
 	if(values.size()!=table.attr_num){
 		cout<<"Attribute num does not match."<<endl;
 		return ;
+	}
+	for(int i=0;i<table.attr_num;i++){
+		if(!checkValueMatchType(table.attrs[i].attr_type,values[i])){
+			cout<<"Type does not match for attribute:"<<table.attrs[i].attr_name<<endl;
+			return ;
+		}
 	}
 
 	return ;
@@ -739,9 +745,6 @@ void execFileClause(string query){
 	
 }
 
-int findUnmatchAttr(vector<Attr> attrs, vector<string> values){
-
-}
 
 /***
   * check if value of string match type
@@ -755,8 +758,16 @@ bool checkValueMatchType(int type, string value){
 		return isInt(value);		
 	}else if(type==2){
 		return isFloat(value);
+	}else if(type>2){
+		int size = value.size();
+		if(size!=type-2){//'value'
+			return false;
+		}
+		if(value[0]!='\'' || value[size-1]!='\'')
+			return false ;
+		return true;
 	}else{
-
+		return false;
 	}
 
 }
@@ -842,13 +853,18 @@ int toInt(string value){
 	return result;
 }
 
+/***
+  * check value is integer
+  ***/
 bool isInt(string value){
 	if(value=="")
 		return false;
-	char *ch = value.c_str();
+	const char *ch = value.c_str();
 	for(int i=0;i<value.size();i++){
 		if(i==0){
-			if(ch[i]!='-' || ch[i]<'0' || ch[i]>'9')
+			if(ch[i]=='-')
+				continue;
+			if(ch[i]<'0' || ch[i]>'9')
 				return false;
 		}else{
 			if(ch[i]<'0' || ch[i]>'9')
@@ -858,14 +874,19 @@ bool isInt(string value){
 	return true;
 }
 
+/***
+  * check value is float 
+  ***/
 bool isFloat(string value){
 	bool point = false;
 	if(value=="")
 		return false;
-	char *ch = value.c_str();
+	const char *ch = value.c_str();
 	for(int i=0;i<value.size();i++){
 		if(i==0){
-			if(ch[i]!='-' || ch[i]<'0' || ch[i]>'9')
+			if(ch[i]=='-')
+				continue;
+			if(ch[i]<'0' || ch[i]>'9')
 				return false;
 		}else{
 			if(ch[i]=='.'){

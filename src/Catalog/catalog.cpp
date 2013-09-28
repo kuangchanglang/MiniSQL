@@ -1,13 +1,19 @@
 #include<string>
 #include<iostream>
 #include<fstream>
+#include<sstream>
 #include<sys/stat.h>
 #include "catalog.h"
 using namespace std;
 
-int mzzain(){
-
-	cout<<createDatabase("haha")<<endl;
+int xxmain(){
+	
+	Table table = getTable("default","en");
+	cout<<table.primarykey_column<<endl;
+	int num = table.attr_num;
+	for(int i=0;i<num;i++){
+		cout<<"xx "<<table.attrs[i].attr_name<<" "<<table.attrs[i].attr_type<<" "<<table.attrs[i].is_unique<<endl;
+	}
 	return 0;
 }
 
@@ -20,6 +26,30 @@ bool isTableExist(string dbname, string tname){
 }
 
 Table getTable(string dbname, string tname){
+	Table table;
+	string table_catalog_path = getTableCatalogPath(dbname,tname);
+	stringstream sstream;
+	ifstream table_file;
+	table_file.open(table_catalog_path.c_str());
+	string line;
+	getline(table_file,line);
+	table.primarykey_column = line;
+
+	getline(table_file,line);
+	sstream<<line;
+	sstream>>table.attr_num;
+	vector<Attr> attrs;
+	for(int i=0;i<table.attr_num;i++){
+		Attr attr;
+		getline(table_file,line);
+		sstream.clear();
+		sstream<<line;
+		sstream>>attr.attr_name>>attr.attr_type>>attr.is_unique;
+		attrs.push_back(attr);
+	}
+
+	table.attrs = attrs;
+	return table;
 }
 
 /***

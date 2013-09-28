@@ -6,7 +6,7 @@
 #include "table.h"
 using namespace std;
 
-extern string current_db;
+extern string CURRENT_DB;
 
 void doOneQuery(string query);
 
@@ -36,10 +36,13 @@ vector<Condition> getConditions(string cond_str);
 Condition getCondition(string one_cond_str);
 
 bool containsDuplicate(vector<Attr> attrs);
+bool checkValueMatchType(int type, string value);
 
 //utils
 void trim(string &src);
 int getType(string type);
 int toInt(string value);
+bool isInt(string value);
+bool isFloat(string value);
 bool isOneWord(string line);
 #endif

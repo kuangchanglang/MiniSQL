@@ -3,9 +3,10 @@
 #include "table.h"
 using namespace std;
 
-void createTable(Table table){
+
+int insertValues(Table table, vector<string> values){
+
 
 }
 
-void createDatabase(){
-}
+
